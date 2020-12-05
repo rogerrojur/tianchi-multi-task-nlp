@@ -73,6 +73,6 @@ def generate_data():
     
 if __name__ == '__main__':
     print('-------------------------------start-----------------------------------')
-    split_dataset()
+    split_dataset(dev_data_cnt=1500)
     generate_data()
     print('-------------------------------finish-----------------------------------')

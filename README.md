@@ -97,3 +97,8 @@ conda install libgcc
 
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/home/user/anaconda3/lib/
 
+---
+
+增加dtp loss
+
+验证集大小 5000 -> 1500

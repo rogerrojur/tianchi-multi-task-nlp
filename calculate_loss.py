@@ -40,7 +40,7 @@ class Calculate_loss():
             res += self.loss(ocemotion_pred, ocemotion_gold)
         return res
 
-    def comput_dtp(self, tnews_pred, ocnli_pred, ocemotion_pred, tnews_gold, ocnli_gold, ocemotion_gold, tnews_kpi=0.1, ocnli_kpi=0.1, ocemotion_kpi=0.1, y=exp(1)):
+    def compute_dtp(self, tnews_pred, ocnli_pred, ocemotion_pred, tnews_gold, ocnli_gold, ocemotion_gold, tnews_kpi=0.1, ocnli_kpi=0.1, ocemotion_kpi=0.1, y=exp(1)):
         res = 0
         if tnews_pred != None:
             res += self.loss(tnews_pred, tnews_gold) * self._calculate_weight(tnews_kpi, y)

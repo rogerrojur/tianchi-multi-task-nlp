@@ -13,8 +13,14 @@ from math import exp, log
 
 
 class Calculate_loss():
-    def __init__(self, label_dict):
-        self.loss = nn.CrossEntropyLoss()
+    def __init__(self, label_dict, weighted=False, tnews_weights=None, ocnli_weights=None, ocemotion_weights=None):
+        self.weighted = weighted
+        if weighted:
+            self.tnews_loss = nn.CrossEntropyLoss(tnews_weights)
+            self.ocnli_loss = nn.CrossEntropyLoss(ocnli_weights)
+            self.ocemotion_loss = nn.CrossEntropyLoss(ocemotion_weights)
+        else:
+            self.loss = nn.CrossEntropyLoss()
         self.label2idx = dict()
         self.idx2label = dict()
         for key in ['TNEWS', 'OCNLI', 'OCEMOTION']:
@@ -33,21 +39,21 @@ class Calculate_loss():
     def compute(self, tnews_pred, ocnli_pred, ocemotion_pred, tnews_gold, ocnli_gold, ocemotion_gold):
         res = 0
         if tnews_pred != None:
-            res += self.loss(tnews_pred, tnews_gold)
+            res += self.tnews_loss(tnews_pred, tnews_gold) if self.weighted else self.loss(tnews_pred, tnews_gold)
         if ocnli_pred != None:
-            res += self.loss(ocnli_pred, ocnli_gold)
+            res += self.ocnli_loss(ocnli_pred, ocnli_gold) if self.weighted else self.loss(ocnli_pred, ocnli_gold)
         if ocemotion_pred != None:
-            res += self.loss(ocemotion_pred, ocemotion_gold)
+            res += self.ocemotion_loss(ocemotion_pred, ocemotion_gold) if self.weighted else self.loss(ocemotion_pred, ocemotion_gold)
         return res
 
     def compute_dtp(self, tnews_pred, ocnli_pred, ocemotion_pred, tnews_gold, ocnli_gold, ocemotion_gold, tnews_kpi=0.1, ocnli_kpi=0.1, ocemotion_kpi=0.1, y=0.5):
         res = 0
         if tnews_pred != None:
-            res += self.loss(tnews_pred, tnews_gold) * self._calculate_weight(tnews_kpi, y)
+            res += self.tnews_loss(tnews_pred, tnews_gold) * self._calculate_weight(tnews_kpi, y) if self.weighted else self.loss(tnews_pred, tnews_gold) * self._calculate_weight(tnews_kpi, y)
         if ocnli_pred != None:
-            res += self.loss(ocnli_pred, ocnli_gold) * self._calculate_weight(ocnli_kpi, y)
+            res += self.ocnli_loss(ocnli_pred, ocnli_gold) * self._calculate_weight(ocnli_kpi, y) if self.weighted else self.loss(ocnli_pred, ocnli_gold) * self._calculate_weight(ocnli_kpi, y)
         if ocemotion_pred != None:
-            res += self.loss(ocemotion_pred, ocemotion_gold) * self._calculate_weight(ocemotion_kpi, y)
+            res += self.ocemotion_loss(ocemotion_pred, ocemotion_gold) * self._calculate_weight(ocemotion_kpi, y) if self.weighted else self.loss(ocemotion_pred, ocemotion_gold) * self._calculate_weight(ocemotion_kpi, y)
         return res
 
     

@@ -15,7 +15,7 @@ from data_generator import Data_generator
 from calculate_loss import Calculate_loss
 
 
-def train(epochs=20, batchSize=64, lr=0.0001, device='cuda:3', accumulate=True, a_step=16, load_saved=False, file_path='./saved_best.pt', use_dtp=False, pretrained_model='./bert_pretrain_model', tokenizer_model='bert-base-chinese'):
+def train(epochs=20, batchSize=64, lr=0.0001, device='cuda:3', accumulate=True, a_step=16, load_saved=False, file_path='./saved_best.pt', use_dtp=False, pretrained_model='./bert_pretrain_model', tokenizer_model='bert-base-chinese', weighted_loss=False):
     device = device
     tokenizer = load_tokenizer(tokenizer_model)
     my_net = torch.load(file_path) if load_saved else Net(load_pretrained_model(pretrained_model))
@@ -24,6 +24,11 @@ def train(epochs=20, batchSize=64, lr=0.0001, device='cuda:3', accumulate=True, 
     with open('./tianchi_datasets/label.json') as f:
         for line in f:
             label_dict = json.loads(line)
+            break
+    label_weights_dict = dict()
+    with open('./tianchi_datasets/label_weights.json') as f:
+        for line in f:
+            label_weights_dict = json.loads(line)
             break
     ocnli_train = dict()
     with open('./tianchi_datasets/OCNLI/train.json') as f:
@@ -57,7 +62,7 @@ def train(epochs=20, batchSize=64, lr=0.0001, device='cuda:3', accumulate=True, 
             break
     train_data_generator = Data_generator(ocnli_train, ocemotion_train, tnews_train, label_dict, device, tokenizer)
     dev_data_generator = Data_generator(ocnli_dev, ocemotion_dev, tnews_dev, label_dict, device, tokenizer)
-    loss_object = Calculate_loss(label_dict)
+    loss_object = Calculate_loss(label_dict, weighted=weighted_loss, tnews_weights=label_weights_dict['TNEWS'], ocnli_weights=label_weights_dict['OCNLI'], ocemotion_weights=label_weights_dict['OCEMOTION'])
     optimizer=torch.optim.Adam(my_net.parameters(),lr=lr)
     best_dev_f1 = 0.0
     best_epoch = -1
@@ -239,4 +244,4 @@ if __name__ == '__main__':
     print('---------------------start training-----------------------')
     pretrained_model = './robert_pretrain_model'
     tokenizer_model = './robert_pretrain_model'
-    train(batchSize=16, device='cuda:3', lr=0.0001, use_dtp=True, pretrained_model=pretrained_model, tokenizer_model=tokenizer_model)
+    train(batchSize=16, device='cuda:3', lr=0.0001, use_dtp=True, pretrained_model=pretrained_model, tokenizer_model=tokenizer_model, weighted_loss=True)

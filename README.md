@@ -1,7 +1,7 @@
 # tianchi-multi-task-nlp
 NLP中文预训练模型泛化能力挑战赛
 
-pytorch版本 baseline
+pytorch版本 baseline f1-score 0.607
 
 需要安装 huggingface 和 pytorch
 
@@ -101,4 +101,6 @@ export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/home/user/anaconda3/lib/
 
 增加dtp loss
 
-验证集大小 5000 -> 1500
+验证集大小 5000 -> 3000
+
+增加weighted_loss

@@ -9,6 +9,7 @@ Created on Sat Dec  5 17:23:01 2020
 import torch
 from torch import nn
 import numpy as np
+from math import exp, log
 
 
 class Calculate_loss():
@@ -38,6 +39,17 @@ class Calculate_loss():
         if ocemotion_pred != None:
             res += self.loss(ocemotion_pred, ocemotion_gold)
         return res
+
+    def comput_dtp(self, tnews_pred, ocnli_pred, ocemotion_pred, tnews_gold, ocnli_gold, ocemotion_gold, tnews_kpi=0.1, ocnli_kpi=0.1, ocemotion_kpi=0.1, y=exp(1)):
+        res = 0
+        if tnews_pred != None:
+            res += self.loss(tnews_pred, tnews_gold) * self._calculate_weight(tnews_kpi, y)
+        if ocnli_pred != None:
+            res += self.loss(ocnli_pred, ocnli_gold) * self._calculate_weight(ocnli_kpi, y)
+        if ocemotion_pred != None:
+            res += self.loss(ocemotion_pred, ocemotion_gold) * self._calculate_weight(ocemotion_kpi, y)
+        return res
+
     
     def correct_cnt(self, tnews_pred, ocnli_pred, ocemotion_pred, tnews_gold, ocnli_gold, ocemotion_gold):
         good_nb = 0
@@ -61,6 +73,33 @@ class Calculate_loss():
                     good_nb += 1
                 total_nb += 1
         return good_nb, total_nb
+
+    def correct_cnt_each(self, tnews_pred, ocnli_pred, ocemotion_pred, tnews_gold, ocnli_gold, ocemotion_gold):
+        good_ocnli_nb = 0
+        good_ocemotion_nb = 0
+        good_tnews_nb = 0
+        total_ocnli_nb = 0
+        total_ocemotion_nb = 0
+        total_tnews_nb = 0
+        if tnews_pred != None:
+            tnews_val = torch.argmax(tnews_pred, axis=1)
+            for i, e in enumerate(tnews_gold):
+                if e == tnews_val[i]:
+                    good_tnews_nb += 1
+                total_tnews_nb += 1
+        if ocnli_pred != None:
+            ocnli_val = torch.argmax(ocnli_pred, axis=1)
+            for i, e in enumerate(ocnli_gold):
+                if e == ocnli_val[i]:
+                    good_ocnli_nb += 1
+                total_ocnli_nb += 1
+        if ocemotion_pred != None:
+            ocemotion_val = torch.argmax(ocemotion_pred, axis=1)
+            for i, e in enumerate(ocemotion_gold):
+                if e == ocemotion_val[i]:
+                    good_ocemotion_nb += 1
+                total_ocemotion_nb += 1
+        return good_tnews_nb, good_ocnli_nb, good_ocemotion_nb, total_tnews_nb, total_ocnli_nb, total_ocemotion_nb
     
     def collect_pred_and_gold(self, pred, gold):
         if pred == None or gold == None:
@@ -68,3 +107,9 @@ class Calculate_loss():
         else:
             p, g = np.array(torch.argmax(pred, axis=1).cpu()).tolist(), np.array(gold.cpu()).tolist()
         return p, g
+
+    def _calculate_weight(self, kpi, y):
+        kpi = max(0.1, kpi)
+        kpi = min(0.99, kpi)
+        w = -1 * ((1 - kpi) ** y) * log(kpi)
+        return w

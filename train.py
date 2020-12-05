@@ -15,7 +15,7 @@ from data_generator import Data_generator
 from calculate_loss import Calculate_loss
 
 
-def train(epochs=20, batchSize=64, lr=0.0001, device='cuda:3', accumulate=True, a_step=16, load_saved=False, file_path='./saved_best.pt'):
+def train(epochs=20, batchSize=64, lr=0.0001, device='cuda:3', accumulate=True, a_step=16, load_saved=False, file_path='./saved_best.pt', use_dtp=False):
     device = device
     model_name = 'bert-base-chinese'
     tokenizer = BertTokenizer.from_pretrained(model_name)
@@ -68,6 +68,9 @@ def train(epochs=20, batchSize=64, lr=0.0001, device='cuda:3', accumulate=True, 
         train_loss = 0.0
         train_total = 0
         train_correct = 0
+        train_ocnli_correct = 0
+        train_ocemotion_correct = 0
+        train_tnews_correct = 0
         train_ocnli_pred_list = []
         train_ocnli_gold_list = []
         train_ocemotion_pred_list = []
@@ -92,7 +95,14 @@ def train(epochs=20, batchSize=64, lr=0.0001, device='cuda:3', accumulate=True, 
             if not accumulate:
                 optimizer.zero_grad()
             ocnli_pred, ocemotion_pred, tnews_pred = my_net(**data)
-            current_loss = loss_object.compute(tnews_pred, ocnli_pred, ocemotion_pred, tnews_gold, ocnli_gold, ocemotion_gold)
+            if use_dtp:
+                tnews_kpi = 0.1 if len(train_tnews_pred_list) == 0 else train_tnews_correct / len(train_tnews_pred_list)
+                ocnli_kpi = 0.1 if len(train_ocnli_pred_list) == 0 else train_ocnli_correct / len(train_ocnli_pred_list)
+                ocemotion_kpi = 0.1 if len(train_ocemotion_pred_list) == 0 else train_ocemotion_correct / len(train_ocemotion_pred_list)
+                current_loss = loss_object.compute_dtp(tnews_pred, ocnli_pred, ocemotion_pred, tnews_gold, ocnli_gold,
+                                                   ocemotion_gold, tnews_kpi, ocnli_kpi, ocemotion_kpi)
+            else:
+                current_loss = loss_object.compute(tnews_pred, ocnli_pred, ocemotion_pred, tnews_gold, ocnli_gold, ocemotion_gold)
             train_loss += current_loss.item()
             current_loss.backward()
             if accumulate and (cnt_train + 1) % a_step == 0:
@@ -100,7 +110,15 @@ def train(epochs=20, batchSize=64, lr=0.0001, device='cuda:3', accumulate=True, 
                 optimizer.zero_grad()
             if not accumulate:
                 optimizer.step()
-            tmp_good, tmp_total = loss_object.correct_cnt(tnews_pred, ocnli_pred, ocemotion_pred, tnews_gold, ocnli_gold, ocemotion_gold)
+            if use_dtp:
+                good_tnews_nb, good_ocnli_nb, good_ocemotion_nb, total_tnews_nb, total_ocnli_nb, total_ocemotion_nb = loss_object.correct_cnt_each(tnews_pred, ocnli_pred, ocemotion_pred, tnews_gold, ocnli_gold, ocemotion_gold)
+                tmp_good += sum([good_tnews_nb, good_ocnli_nb, good_ocemotion_nb])
+                tmp_total += sum([total_tnews_nb, total_ocnli_nb, total_ocemotion_nb])
+                train_ocemotion_correct += good_ocemotion_nb
+                train_ocnli_correct += good_ocnli_nb
+                train_tnews_correct += good_tnews_nb
+            else:
+                tmp_good, tmp_total = loss_object.correct_cnt(tnews_pred, ocnli_pred, ocemotion_pred, tnews_gold, ocnli_gold, ocemotion_gold)
             train_correct += tmp_good
             train_total += tmp_total
             p, g = loss_object.collect_pred_and_gold(ocnli_pred, ocnli_gold)
@@ -136,6 +154,9 @@ def train(epochs=20, batchSize=64, lr=0.0001, device='cuda:3', accumulate=True, 
         dev_loss = 0.0
         dev_total = 0
         dev_correct = 0
+        dev_ocnli_correct = 0
+        dev_ocemotion_correct = 0
+        dev_tnews_correct = 0
         dev_ocnli_pred_list = []
         dev_ocnli_gold_list = []
         dev_ocemotion_pred_list = []
@@ -159,9 +180,29 @@ def train(epochs=20, batchSize=64, lr=0.0001, device='cuda:3', accumulate=True, 
                 ocnli_gold = raw_data['ocnli_gold']
                 ocemotion_gold = raw_data['ocemotion_gold']
                 ocnli_pred, ocemotion_pred, tnews_pred = my_net(**data)
-                current_loss = loss_object.compute(tnews_pred, ocnli_pred, ocemotion_pred, tnews_gold, ocnli_gold, ocemotion_gold)
+                if use_dtp:
+                    tnews_kpi = 0.1 if len(dev_tnews_pred_list) == 0 else dev_tnews_correct / len(
+                        dev_tnews_pred_list)
+                    ocnli_kpi = 0.1 if len(dev_ocnli_pred_list) == 0 else dev_ocnli_correct / len(
+                        dev_ocnli_pred_list)
+                    ocemotion_kpi = 0.1 if len(dev_ocemotion_pred_list) == 0 else dev_ocemotion_correct / len(
+                        dev_ocemotion_pred_list)
+                    current_loss = loss_object.compute_dtp(tnews_pred, ocnli_pred, ocemotion_pred, tnews_gold,
+                                                           ocnli_gold,
+                                                           ocemotion_gold, tnews_kpi, ocnli_kpi, ocemotion_kpi)
+                else:
+                    current_loss = loss_object.compute(tnews_pred, ocnli_pred, ocemotion_pred, tnews_gold, ocnli_gold, ocemotion_gold)
                 dev_loss += current_loss.item()
-                tmp_good, tmp_total = loss_object.correct_cnt(tnews_pred, ocnli_pred, ocemotion_pred, tnews_gold, ocnli_gold, ocemotion_gold)
+                if use_dtp:
+                    good_tnews_nb, good_ocnli_nb, good_ocemotion_nb, total_tnews_nb, total_ocnli_nb, total_ocemotion_nb = loss_object.correct_cnt_each(
+                        tnews_pred, ocnli_pred, ocemotion_pred, tnews_gold, ocnli_gold, ocemotion_gold)
+                    tmp_good += sum([good_tnews_nb, good_ocnli_nb, good_ocemotion_nb])
+                    tmp_total += sum([total_tnews_nb, total_ocnli_nb, total_ocemotion_nb])
+                    dev_ocemotion_correct += good_ocemotion_nb
+                    dev_ocnli_correct += good_ocnli_nb
+                    dev_tnews_correct += good_tnews_nb
+                else:
+                    tmp_good, tmp_total = loss_object.correct_cnt(tnews_pred, ocnli_pred, ocemotion_pred, tnews_gold, ocnli_gold, ocemotion_gold)
                 dev_correct += tmp_good
                 dev_total += tmp_total
                 p, g = loss_object.collect_pred_and_gold(ocnli_pred, ocnli_gold)
@@ -198,4 +239,4 @@ def train(epochs=20, batchSize=64, lr=0.0001, device='cuda:3', accumulate=True, 
                 
 if __name__ == '__main__':
     print('---------------------start training-----------------------')
-    train(batchSize=16, device='cuda:3', lr=0.0001)
+    train(batchSize=16, device='cuda:3', lr=0.0001, use_dtp=True)

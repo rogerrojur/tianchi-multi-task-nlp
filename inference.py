@@ -27,7 +27,7 @@ def test_csv_to_json():
                         json_dict[tmp_list[0]]['s2'] = tmp_list[2]
                 fw.write(json.dumps(json_dict))
                 
-def inference_warpper():
+def inference_warpper(tokenizer_model='bert-base-chinese'):
     ocnli_test = dict()
     with open('./tianchi_datasets/OCNLI/test.json') as f:
         for line in f:
@@ -53,8 +53,7 @@ def inference_warpper():
             break
         
     model = torch.load('./saved_best.pt')
-    model_name = 'bert-base-chinese'
-    tokenizer = BertTokenizer.from_pretrained(model_name)
+    tokenizer = BertTokenizer.from_pretrained(tokenizer_model)
     inference('./submission/5928/ocnli_predict.json', ocnli_test, model, tokenizer, label_dict['OCNLI'], 'ocnli', 'cuda:3', 64, True)
     inference('./submission/5928/ocemotion_predict.json', ocemotion_test, model, tokenizer, label_dict['OCEMOTION'], 'ocemotion', 'cuda:3', 64, True)
     inference('./submission/5928/tnews_predict.json', tnews_test, model, tokenizer, label_dict['TNEWS'], 'tnews', 'cuda:3', 64, True)

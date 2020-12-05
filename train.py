@@ -9,18 +9,17 @@ Created on Sat Dec  5 17:34:27 2020
 import torch
 from transformers import BertModel, BertTokenizer
 import json
-from utils import get_f1, print_result
+from utils import get_f1, print_result, load_pretrained_model, load_tokenizer
 from net import Net
 from data_generator import Data_generator
 from calculate_loss import Calculate_loss
 
 
-def train(epochs=20, batchSize=64, lr=0.0001, device='cuda:3', accumulate=True, a_step=16, load_saved=False, file_path='./saved_best.pt', use_dtp=False):
+def train(epochs=20, batchSize=64, lr=0.0001, device='cuda:3', accumulate=True, a_step=16, load_saved=False, file_path='./saved_best.pt', use_dtp=False, pretrained_model='./bert_pretrain_model', tokenizer_model='bert-base-chinese'):
     device = device
-    model_name = 'bert-base-chinese'
-    tokenizer = BertTokenizer.from_pretrained(model_name)
-    bert_model = torch.load(file_path) if load_saved else BertModel.from_pretrained('./bert_pretrain_model')
-    my_net = Net(bert_model)
+    tokenizer = load_tokenizer(tokenizer_model)
+    bert_model = load_pretrained_model(pretrained_model)
+    my_net = torch.load(file_path) if load_saved else Net(bert_model)
     my_net.to(device)
     label_dict = dict()
     with open('./tianchi_datasets/label.json') as f:

@@ -112,6 +112,7 @@ def inference(path, data_dict, model, tokenizer, idx2label, task_type, device='c
                         f.write('\n')
                         
 if __name__ == '__main__':
+    test_csv_to_json()
     print('---------------------------------start inference-----------------------------')
     inference_warpper()
     

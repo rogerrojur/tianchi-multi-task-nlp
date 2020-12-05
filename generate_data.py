@@ -56,7 +56,7 @@ def generate_data():
     for k in label_set:
         label_weight_set[k] = [label_cnt_set[k][e] for e in label_set[k]]
         total_weight = sum(label_weight_set[k])
-        label_weight_set[k] = [log(total_weight / e) for e in label_set[k]]
+        label_weight_set[k] = [log(total_weight / e) for e in label_weight_set[k]]
     for k, v in label_weight_set.items():
         print(k, v)
     with open('./tianchi_datasets/label_weights.json', 'w') as fw:

@@ -18,8 +18,7 @@ from calculate_loss import Calculate_loss
 def train(epochs=20, batchSize=64, lr=0.0001, device='cuda:3', accumulate=True, a_step=16, load_saved=False, file_path='./saved_best.pt', use_dtp=False, pretrained_model='./bert_pretrain_model', tokenizer_model='bert-base-chinese'):
     device = device
     tokenizer = load_tokenizer(tokenizer_model)
-    bert_model = load_pretrained_model(pretrained_model)
-    my_net = torch.load(file_path) if load_saved else Net(bert_model)
+    my_net = torch.load(file_path) if load_saved else Net(load_pretrained_model(pretrained_model))
     my_net.to(device)
     label_dict = dict()
     with open('./tianchi_datasets/label.json') as f:

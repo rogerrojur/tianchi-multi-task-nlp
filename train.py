@@ -237,4 +237,6 @@ def train(epochs=20, batchSize=64, lr=0.0001, device='cuda:3', accumulate=True, 
                 
 if __name__ == '__main__':
     print('---------------------start training-----------------------')
-    train(batchSize=16, device='cuda:3', lr=0.0001, use_dtp=True)
+    pretrained_model = './robert_pretrain_model'
+    tokenizer_model = './robert_pretrain_model'
+    train(batchSize=16, device='cuda:3', lr=0.0001, use_dtp=True, pretrained_model=pretrained_model, tokenizer_model=tokenizer_model)

@@ -62,8 +62,11 @@ def train(epochs=20, batchSize=64, lr=0.0001, device='cuda:3', accumulate=True, 
             break
     train_data_generator = Data_generator(ocnli_train, ocemotion_train, tnews_train, label_dict, device, tokenizer)
     dev_data_generator = Data_generator(ocnli_dev, ocemotion_dev, tnews_dev, label_dict, device, tokenizer)
-    loss_object = Calculate_loss(label_dict, weighted=weighted_loss, tnews_weights=label_weights_dict['TNEWS'], ocnli_weights=label_weights_dict['OCNLI'], ocemotion_weights=label_weights_dict['OCEMOTION'])
-    optimizer=torch.optim.Adam(my_net.parameters(),lr=lr)
+    tnews_weights = torch.tensor(label_weights_dict['TNEWS']).to(device)
+    ocnli_weights = torch.tensor(label_weights_dict['OCNLI']).to(device)
+    ocemotion_weights = torch.tensor(label_weights_dict['OCEMOTION']).to(device)
+    loss_object = Calculate_loss(label_dict, weighted=weighted_loss, tnews_weights=tnews_weights, ocnli_weights=ocnli_weights, ocemotion_weights=ocemotion_weights)
+    optimizer=torch.optim.Adam(my_net.parameters(), lr=lr)
     best_dev_f1 = 0.0
     best_epoch = -1
     for epoch in range(epochs):

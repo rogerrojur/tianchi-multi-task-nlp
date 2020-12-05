@@ -99,8 +99,10 @@ export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/home/user/anaconda3/lib/
 
 ---
 
-增加dtp loss
+增加 dtp loss
 
 验证集大小 5000 -> 3000
 
-增加weighted_loss
+用 chinese-roberta-wwm-ext 作为预训练模型
+
+增加 weighted_loss

@@ -112,8 +112,8 @@ def train(epochs=20, batchSize=64, lr=0.0001, device='cuda:3', accumulate=True, 
                 optimizer.step()
             if use_dtp:
                 good_tnews_nb, good_ocnli_nb, good_ocemotion_nb, total_tnews_nb, total_ocnli_nb, total_ocemotion_nb = loss_object.correct_cnt_each(tnews_pred, ocnli_pred, ocemotion_pred, tnews_gold, ocnli_gold, ocemotion_gold)
-                tmp_good += sum([good_tnews_nb, good_ocnli_nb, good_ocemotion_nb])
-                tmp_total += sum([total_tnews_nb, total_ocnli_nb, total_ocemotion_nb])
+                tmp_good = sum([good_tnews_nb, good_ocnli_nb, good_ocemotion_nb])
+                tmp_total = sum([total_tnews_nb, total_ocnli_nb, total_ocemotion_nb])
                 train_ocemotion_correct += good_ocemotion_nb
                 train_ocnli_correct += good_ocnli_nb
                 train_tnews_correct += good_tnews_nb

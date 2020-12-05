@@ -51,6 +51,10 @@ tail -f ./train.log
 
 ---
 
+在输出预测结果前，先在 tianchi-multi-task-nlp/submission 下新建一个文件夹 5928
+
+由于验证集的f1分数是0.5928，所以我就用这个文件夹名
+
 用训练好的模型 ./saved_best.pt 生成结果：
 
 python ./inference.py

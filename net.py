@@ -28,6 +28,8 @@ class Net(nn.Module):
         if ocnli_ids.size()[0] > 0:
             attention_score = attention_score[ocnli_ids, :, :]
             ocnli_value = self.OCNLI_layer(cls_emb[ocnli_ids, :]).contiguous().view(-1, 16, 3)
+            print(attention_score.size())
+            print(ocnli_value.size())
             ocnli_out = torch.matmul(attention_score, ocnli_value).squeeze(1)
         else:
             ocnli_out = None

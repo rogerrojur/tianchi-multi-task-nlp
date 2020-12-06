@@ -114,3 +114,5 @@ export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/home/user/anaconda3/lib/
 用 chinese-roberta-wwm-ext 作为预训练模型
 
 增加 weighted_loss
+
+尝试使用attention

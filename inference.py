@@ -12,6 +12,7 @@ import json
 import torch
 import numpy as np
 from transformers import BertModel, BertTokenizer
+from utils import get_task_chinese
 
 
 def test_csv_to_json():
@@ -58,10 +59,11 @@ def inference_warpper(tokenizer_model='bert-base-chinese'):
     inference('./submission/5928/ocemotion_predict.json', ocemotion_test, model, tokenizer, label_dict['OCEMOTION'], 'ocemotion', 'cuda:3', 64, True)
     inference('./submission/5928/tnews_predict.json', tnews_test, model, tokenizer, label_dict['TNEWS'], 'tnews', 'cuda:3', 64, True)
         
-def inference(path, data_dict, model, tokenizer, idx2label, task_type, device='cuda:3', batchSize=64, print_result=True):
+def inference(path, data_dict, model, tokenizer, idx2label, task_type, device='cuda:3', batchSize=64, max_len=512, print_result=True):
     if task_type != 'ocnli' and task_type != 'ocemotion' and task_type != 'tnews':
         print('task_type is incorrect!')
         return
+    task_chinese = get_task_chinese(task_type)
     model.to(device)
     model.eval()
     ids_list = [k for k, _ in data_dict.items()]
@@ -71,10 +73,11 @@ def inference(path, data_dict, model, tokenizer, idx2label, task_type, device='c
             while next_start_ids < len(ids_list):
                 cur_ids_list = ids_list[next_start_ids: next_start_ids + batchSize]
                 next_start_ids += batchSize
+                sentence1 = [task_chinese + data_dict[idx]['s1'] for idx in cur_ids_list]
                 if task_type == 'ocnli':
-                    flower = tokenizer([data_dict[idx]['s1'] for idx in cur_ids_list], [data_dict[idx]['s2'] for idx in cur_ids_list], add_special_tokens=True, padding=True, return_tensors='pt', truncation=True)
+                    flower = tokenizer(sentence1, [data_dict[idx]['s2'] for idx in cur_ids_list], add_special_tokens=True, max_length=max_len, padding=True, return_tensors='pt', truncation=True)
                 else:
-                    flower = tokenizer([data_dict[idx]['s1'] for idx in cur_ids_list], add_special_tokens=True, padding=True, return_tensors='pt', truncation=True)
+                    flower = tokenizer(sentence1, add_special_tokens=True, max_length=max_len, padding=True, return_tensors='pt', truncation=True)
                 input_ids = flower['input_ids'].to(device)
                 token_type_ids = flower['token_type_ids'].to(device)
                 attention_mask = flower['attention_mask'].to(device)

@@ -27,3 +27,11 @@ def load_tokenizer(path_or_name):
 
 def load_pretrained_model(path_or_name):
     return BertModel.from_pretrained(path_or_name)
+
+def get_task_chinese(task_type):
+    if task_type == 'ocnli':
+        return '(中文原版自然语言推理)'
+    elif task_type == 'ocemotion':
+        return '(中文情感分类)'
+    else:
+        return '(今日头条新闻标题分类)'

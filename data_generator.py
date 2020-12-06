@@ -85,19 +85,19 @@ class Data_generator():
         ocemotion_gold = None
         tnews_gold = None
         if len(ocnli_cur) > 0:
-            flower = self.tokenizer([self.ocnli_data['s1'][idx] for idx in ocnli_cur], [self.ocnli_data['s2'][idx] for idx in ocnli_cur], add_special_tokens=True, max_length=max_len, padding='max_length', return_tensors='pt', truncation=True)
+            flower = self.tokenizer(['(中文原版自然语言推理)' + self.ocnli_data['s1'][idx] for idx in ocnli_cur], [self.ocnli_data['s2'][idx] for idx in ocnli_cur], add_special_tokens=True, max_length=max_len, padding='max_length', return_tensors='pt', truncation=True)
             input_ids.append(flower['input_ids'])
             token_type_ids.append(flower['token_type_ids'])
             attention_mask.append(flower['attention_mask'])
             ocnli_gold = torch.tensor([self.ocnli_data['label'][idx] for idx in ocnli_cur]).to(self.device)
         if len(ocemotion_cur) > 0:
-            flower = self.tokenizer([self.ocemotion_data['s1'][idx] for idx in ocemotion_cur], add_special_tokens=True, max_length=max_len, padding='max_length', return_tensors='pt', truncation=True)
+            flower = self.tokenizer(['(中文情感分类)' + self.ocemotion_data['s1'][idx] for idx in ocemotion_cur], add_special_tokens=True, max_length=max_len, padding='max_length', return_tensors='pt', truncation=True)
             input_ids.append(flower['input_ids'])
             token_type_ids.append(flower['token_type_ids'])
             attention_mask.append(flower['attention_mask'])
             ocemotion_gold = torch.tensor([self.ocemotion_data['label'][idx] for idx in ocemotion_cur]).to(self.device)
         if len(tnews_cur) > 0:
-            flower = self.tokenizer([self.tnews_data['s1'][idx] for idx in tnews_cur], add_special_tokens=True, max_length=max_len, padding='max_length', return_tensors='pt', truncation=True)
+            flower = self.tokenizer(['(今日头条新闻标题分类)' + self.tnews_data['s1'][idx] for idx in tnews_cur], add_special_tokens=True, max_length=max_len, padding='max_length', return_tensors='pt', truncation=True)
             input_ids.append(flower['input_ids'])
             token_type_ids.append(flower['token_type_ids'])
             attention_mask.append(flower['attention_mask'])

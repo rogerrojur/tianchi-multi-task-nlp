@@ -15,7 +15,7 @@ class Net(nn.Module):
     def __init__(self, bert_model):
         super(Net, self).__init__()
         self.bert = bert_model
-        self.atten_layer = nn.Linear(768, 32)
+        self.atten_layer = nn.Linear(768, 16)
         self.softmax_d1 = nn.Softmax(dim=1)
         self.OCNLI_layer = nn.Linear(768, 16 * 3)
         self.OCEMOTION_layer = nn.Linear(768, 16 * 7)
@@ -28,8 +28,6 @@ class Net(nn.Module):
         if ocnli_ids.size()[0] > 0:
             attention_score = attention_score[ocnli_ids, :, :]
             ocnli_value = self.OCNLI_layer(cls_emb[ocnli_ids, :]).contiguous().view(-1, 16, 3)
-            print(attention_score.size())
-            print(ocnli_value.size())
             ocnli_out = torch.matmul(attention_score, ocnli_value).squeeze(1)
         else:
             ocnli_out = None

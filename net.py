@@ -17,9 +17,9 @@ class Net(nn.Module):
         self.bert = bert_model
         self.atten_layer = nn.Linear(768, 32)
         self.softmax_d1 = nn.Softmax(dim=1)
-        self.OCNLI_layer = nn.Linear(16 * 3)
-        self.OCEMOTION_layer = nn.Linear(16 * 7)
-        self.TNEWS_layer = nn.Linear(16 * 15)
+        self.OCNLI_layer = nn.Linear(768, 16 * 3)
+        self.OCEMOTION_layer = nn.Linear(768, 16 * 7)
+        self.TNEWS_layer = nn.Linear(768, 16 * 15)
 
     def forward(self, input_ids, ocnli_ids, ocemotion_ids, tnews_ids, token_type_ids=None, attention_mask=None):
         cls_emb = self.bert(input_ids=input_ids, token_type_ids=token_type_ids, attention_mask=attention_mask)[0][:, 0, :].squeeze(1)

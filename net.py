@@ -23,22 +23,23 @@ class Net(nn.Module):
 
     def forward(self, input_ids, ocnli_ids, ocemotion_ids, tnews_ids, token_type_ids=None, attention_mask=None):
         cls_emb = self.bert(input_ids=input_ids, token_type_ids=token_type_ids, attention_mask=attention_mask)[0][:, 0, :].squeeze(1)
-        attention_score = self.atten_layer(cls_emb)
-        attention_score = self.softmax_d1(attention_score).unsqueeze(1)
         if ocnli_ids.size()[0] > 0:
-            attention_score = attention_score[ocnli_ids, :, :]
+            attention_score = self.atten_layer(cls_emb[ocnli_ids, :])
+            attention_score = self.softmax_d1(attention_score).unsqueeze(1)
             ocnli_value = self.OCNLI_layer(cls_emb[ocnli_ids, :]).contiguous().view(-1, 16, 3)
             ocnli_out = torch.matmul(attention_score, ocnli_value).squeeze(1)
         else:
             ocnli_out = None
         if ocemotion_ids.size()[0] > 0:
-            attention_score = attention_score[ocemotion_ids, :, :]
+            attention_score = self.atten_layer(cls_emb[ocemotion_ids, :])
+            attention_score = self.softmax_d1(attention_score).unsqueeze(1)
             ocemotion_value = self.OCEMOTION_layer(cls_emb[ocemotion_ids, :]).contiguous().view(-1, 16, 7)
             ocemotion_out = torch.matmul(attention_score, ocemotion_value).squeeze(1)
         else:
             ocemotion_out = None
         if tnews_ids.size()[0] > 0:
-            attention_score = attention_score[tnews_ids, :, :]
+            attention_score = self.atten_layer(cls_emb[tnews_ids, :])
+            attention_score = self.softmax_d1(attention_score).unsqueeze(1)
             tnews_value = self.TNEWS_layer(cls_emb[tnews_ids, :]).contiguous().view(-1, 16, 15)
             tnews_out = torch.matmul(attention_score, tnews_value).squeeze(1)
         else:

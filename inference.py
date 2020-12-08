@@ -28,7 +28,7 @@ def test_csv_to_json():
                         json_dict[tmp_list[0]]['s2'] = tmp_list[2]
                 fw.write(json.dumps(json_dict))
                 
-def inference_warpper(tokenizer_model='bert-base-chinese'):
+def inference_warpper(tokenizer_model):
     ocnli_test = dict()
     with open('./tianchi_datasets/OCNLI/test.json') as f:
         for line in f:
@@ -63,7 +63,6 @@ def inference(path, data_dict, model, tokenizer, idx2label, task_type, device='c
     if task_type != 'ocnli' and task_type != 'ocemotion' and task_type != 'tnews':
         print('task_type is incorrect!')
         return
-    #task_chinese = get_task_chinese(task_type)
     model.to(device, non_blocking=True)
     model.eval()
     ids_list = [k for k, _ in data_dict.items()]
@@ -73,11 +72,10 @@ def inference(path, data_dict, model, tokenizer, idx2label, task_type, device='c
             while next_start_ids < len(ids_list):
                 cur_ids_list = ids_list[next_start_ids: next_start_ids + batchSize]
                 next_start_ids += batchSize
-                sentence1 = [data_dict[idx]['s1'] for idx in cur_ids_list]
                 if task_type == 'ocnli':
-                    flower = tokenizer(sentence1, [data_dict[idx]['s2'] for idx in cur_ids_list], add_special_tokens=True, max_length=max_len, padding=True, return_tensors='pt', truncation=True)
+                    flower = tokenizer([data_dict[idx]['s1'] for idx in cur_ids_list], [data_dict[idx]['s2'] for idx in cur_ids_list], add_special_tokens=True, padding=True, return_tensors='pt')
                 else:
-                    flower = tokenizer(sentence1, add_special_tokens=True, max_length=max_len, padding=True, return_tensors='pt', truncation=True)
+                    flower = tokenizer([data_dict[idx]['s1'] for idx in cur_ids_list], add_special_tokens=True, padding=True, return_tensors='pt')
                 input_ids = flower['input_ids'].to(device, non_blocking=True)
                 token_type_ids = flower['token_type_ids'].to(device, non_blocking=True)
                 attention_mask = flower['attention_mask'].to(device, non_blocking=True)

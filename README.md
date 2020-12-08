@@ -13,7 +13,7 @@ pytorch 版本 1.6.0
 
 ---
 
-pytorch版本 baseline f1-score 0.607
+pytorch版本 baseline f1-score 0.616
 
 需要安装 huggingface 和 pytorch
 

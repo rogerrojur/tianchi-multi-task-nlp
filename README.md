@@ -9,6 +9,10 @@ pytorch 版本 1.6.0
 
 ---
 
+已修复inference全为一个种类的bug，模型结构改出bug了。。。。
+
+---
+
 pytorch版本 baseline f1-score 0.607
 
 需要安装 huggingface 和 pytorch

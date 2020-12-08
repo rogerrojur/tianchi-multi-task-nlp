@@ -247,4 +247,4 @@ if __name__ == '__main__':
     print('---------------------start training-----------------------')
     pretrained_model = './robert_pretrain_model'
     tokenizer_model = './robert_pretrain_model'
-    train(batchSize=16, device='cuda:3', lr=0.0001, use_dtp=True, pretrained_model=pretrained_model, tokenizer_model=tokenizer_model, weighted_loss=True)
+    train(batchSize=16, device='cuda:3', lr=0.0001, use_dtp=True, pretrained_model=pretrained_model, tokenizer_model=tokenizer_model, weighted_loss=False)

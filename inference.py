@@ -59,7 +59,7 @@ def inference_warpper(tokenizer_model):
     inference('./submission/5928/ocemotion_predict.json', ocemotion_test, model, tokenizer, label_dict['OCEMOTION'], 'ocemotion', 'cuda:3', 64, True)
     inference('./submission/5928/tnews_predict.json', tnews_test, model, tokenizer, label_dict['TNEWS'], 'tnews', 'cuda:3', 64, True)
         
-def inference(path, data_dict, model, tokenizer, idx2label, task_type, device='cuda:3', batchSize=64, max_len=512, print_result=True):
+def inference(path, data_dict, model, tokenizer, idx2label, task_type, device='cuda:3', batchSize=64, print_result=True):
     if task_type != 'ocnli' and task_type != 'ocemotion' and task_type != 'tnews':
         print('task_type is incorrect!')
         return

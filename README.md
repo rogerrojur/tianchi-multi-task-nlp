@@ -9,7 +9,7 @@ pytorch 版本 1.6.0
 
 ---
 
-已修复inference全为一个种类的bug，模型结构改出bug了。。。。
+已修复inference全为一个种类的bug，inference的时候设了一个max_len的padding。。。。
 
 ---
 

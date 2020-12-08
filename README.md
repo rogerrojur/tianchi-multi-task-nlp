@@ -35,7 +35,7 @@ tianchi-multi-task-nlp/tianchi_datasets/OCNLI/test.csv
 
 ---
 
-分开训练集和验证集，默认验证集是各5000条数据，参数可以自己修改：
+分开训练集和验证集，默认验证集是各3000条数据，参数可以自己修改：
 
 python ./generate_data.py
 

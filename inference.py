@@ -96,6 +96,7 @@ def inference(path, data_dict, model, tokenizer, idx2label, task_type, device='c
                 else:
                     pred = torch.argmax(tnews_out, axis=1)
                 pred_final = [idx2label[e] for e in np.array(pred.cpu()).tolist()]
+                torch.cuda.empty_cache()
                 for i, idx in enumerate(cur_ids_list):
                     if print_result:
                         print_str = '[ ' + task_type + ' : ' + 'sentence one: ' + data_dict[idx]['s1']

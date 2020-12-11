@@ -137,7 +137,7 @@ def train(epochs=20, batchSize=64, lr=0.0001, device='cuda:3', accumulate=True, 
             train_tnews_pred_list += p
             train_tnews_gold_list += g
             cnt_train += 1
-            torch.cuda.empty_cache()
+            #torch.cuda.empty_cache()
             if (cnt_train + 1) % 1000 == 0:
                 print('[', cnt_train + 1, '- th batch : train acc is:', train_correct / train_total, '; train loss is:', train_loss / cnt_train, ']')
         if accumulate:
@@ -222,7 +222,7 @@ def train(epochs=20, batchSize=64, lr=0.0001, device='cuda:3', accumulate=True, 
                 dev_tnews_pred_list += p
                 dev_tnews_gold_list += g
                 cnt_dev += 1
-                torch.cuda.empty_cache()
+                #torch.cuda.empty_cache()
                 #if (cnt_dev + 1) % 1000 == 0:
                 #    print('[', cnt_dev + 1, '- th batch : dev acc is:', dev_correct / dev_total, '; dev loss is:', dev_loss / cnt_dev, ']')
             dev_ocnli_f1 = get_f1(dev_ocnli_gold_list, dev_ocnli_pred_list)
